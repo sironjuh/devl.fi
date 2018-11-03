@@ -1,9 +1,98 @@
-body {
-    margin: 0;
-    background-color: #000;
-  }
+html, body {
+  font-family: 'Ubuntu', sans-serif;
+  background: #111;
+  overflow: hidden;
+  margin: 0;
+}
   
-  canvas {
-    width: 100%;
-    height: 100%;
-  }
+canvas {
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes show-info {
+  0% { transform: rotateY(120deg); }
+  100% { transform: rotateY(0deg); }
+}
+
+.info {
+  transition: all 180ms ease-out;
+  transform-style: preserve-3d;
+  transform: perspective(800);
+
+  position: absolute;
+  font-size: 12px;
+  opacity: 0.8;
+  color: #fff;
+  width: 240px;
+  left: 0px;
+  top: 20px;
+}
+
+.info:hover {
+  box-shadow: 0 0 0 4px rgba(255,255,255,0.05);
+  opacity: 1.0;
+}
+
+.info h1,
+.info h2,
+.info h3 {
+  line-height: 1;
+  margin: 5px 0;
+}
+
+.info a {
+  transition: all 200ms ease-out;
+
+  border-bottom: 1px dotted rgba(255,255,255,0.4);
+  text-decoration: none;
+  opacity: 0.6;
+  color: #fff;
+}
+
+.info a:hover {
+  opacity: 0.99;
+}
+
+.info .about {
+  transform-origin: 0% 50%;
+  transform: rotateY(120deg);
+
+  margin-bottom: 1px;
+  background: rgba(0,0,0,0.8);
+  padding: 12px 15px 12px 20px;
+}
+
+.info .about {
+  animation: show-info 500ms cubic-bezier(0.230, 1.000, 0.320, 1.000) 600ms 1 normal forwards;
+  padding-bottom: 15px;
+}
+
+.info .about a {
+  opacity: 0.9;
+}
+
+.info .about h1 {
+  letter-spacing: -1px;
+  font-weight: 300;
+  font-size: 19px;
+  opacity: 0.95;
+}
+
+.info .about h2 {
+  font-weight: 300;
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+.info .about h3 {
+  text-transform: uppercase;
+  margin-top: 10px;
+  font-size: 11px;
+}
+
+.info .about a:before {
+  margin-right: 10px;
+  font-size: 14px;
+  content: '\203A';
+}

@@ -1,4 +1,4 @@
-const { random } = _
+const { random } = _;
 
 let w = innerWidth * devicePixelRatio,
     h = innerHeight * devicePixelRatio,
