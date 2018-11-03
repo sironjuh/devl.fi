@@ -11,7 +11,7 @@ canvas {
 }
 
 @keyframes show-info {
-  0% { transform: rotateY(120deg); }
+  0% { transform: rotateY(180deg); }
   100% { transform: rotateY(0deg); }
 }
 
@@ -44,7 +44,7 @@ canvas {
 .info a {
   transition: all 200ms ease-out;
 
-  border-bottom: 1px dotted rgba(255,255,255,0.4);
+
   text-decoration: none;
   opacity: 0.6;
   color: #fff;
@@ -92,7 +92,11 @@ canvas {
 }
 
 .info .about a:before {
-  margin-right: 10px;
   font-size: 14px;
+  margin-right: 2px;
   content: '\203A';
+}
+
+.info .about a:after {
+  content: '\00a0\00a0 ';
 }
