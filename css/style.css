@@ -18,7 +18,7 @@ canvas {
 .info {
   transition: all 180ms ease-out;
   transform-style: preserve-3d;
-  transform: perspective(800);
+  transform: perspective(800px);
 
   position: absolute;
   font-size: 12px;
@@ -44,8 +44,6 @@ canvas {
 
 .info a {
   transition: all 200ms ease-out;
-
-
   text-decoration: none;
   opacity: 0.6;
   color: #fff;
