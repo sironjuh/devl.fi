@@ -1,37 +1,39 @@
-let w = 512,
-    h = 512,
+let canvas_w = 512,
+    canvas_h = 512,
     cv = document.createElement("canvas"),
-    ctx = cv.getContext("2d"),
-    light = new Uint8Array(w*h),
-    timer = 0;
+    ctx = cv.getContext("2d");
+    cv.width = canvas_w;
+    cv.height = canvas_h;
+    cx = canvas_w / 2;
+    cy = canvas_h / 2,
+    rid;
 
-cv.width = w;
-cv.height = h;
-cx = w / 2;
-cy = h / 2;
+let light_w = 128,
+    light_h = 128,
+    light = new Uint8Array(light_w * light_h);
 
 function distance(x1, y1, x2, y2) {
-  return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)) << 0;
+  return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
 }
 
 function generateLight() {
-  let x, y, d, col;
+  let dist, col;
 
-  for (y = 0; y < w; y++) {
-    for (x = 0; x < h; x++) {
-      d = Math.min(distance(x, y, cx, cy), 255);
-      col = 255 - d;
-      light[y * w + x] = col;
+  for (let y = 0; y < light_h; y++) {
+    for (let x = 0; x < light_w; x++) {
+      dist = Math.min(distance(x, y, light_w / 2, light_h / 2) * (canvas_w / light_w), 255);
+      col = 255 - dist;
+      light[y * light_w + x] = col;
     }
   }
 }
 
 function renderLight() {
-  let x, y, col;
+  let col;
 
-  for (y = 0; y < w; y++) {
-    for (x = 0; x < h; x++) {
-      col = light[y * w + x];
+  for (let y = 0; y < light_h; y++) {
+    for (let x = 0; x < light_w; x++) {
+      col = light[y * light_w + x];
       ctx.fillStyle = `rgb(${col}, ${col}, ${col})`;
       ctx.fillRect(x, y, x + 1, y + 1);
     }
