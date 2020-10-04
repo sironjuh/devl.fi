@@ -29,6 +29,7 @@ function main() {
 
   const fragmentSource = `
     precision highp float;
+    precision highp sampler2D;
 
     uniform vec2 u_resolution;
     uniform float u_time;
@@ -263,8 +264,8 @@ function loadTexture(gl, url) {
   // we'll update the texture with the contents of the image.
   const level = 0;
   const internalFormat = gl.RGBA;
-  const width = 1;
-  const height = 1;
+  const width = 512;
+  const height = 512;
   const border = 0;
   const srcFormat = gl.RGBA;
   const srcType = gl.UNSIGNED_BYTE;
@@ -284,6 +285,7 @@ function loadTexture(gl, url) {
     // power of 2 in both dimensions.
     if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
        gl.generateMipmap(gl.TEXTURE_2D);
+       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     } else {
        // not a power of 2. Turn off mips and set wrapping to clamp to edge
        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
