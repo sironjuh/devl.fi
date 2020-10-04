@@ -57,13 +57,52 @@ function main() {
       bump.x = texture2D(u_bump_normal, uv - vec2(.01, 0.)).r - texture2D(u_bump_normal, uv - vec2(-.01, 0.)).r;
       bump.y = texture2D(u_bump_normal, uv - vec2(0., .01)).r - texture2D(u_bump_normal, uv - vec2(0., -.01)).r;
 
-      float light  = .1/(length(result - bump*1.5)) + 1.-length(result - bump*2.);
+      float light  = .1/(length(result - bump*1.5)) + 1.-length(result - bump*3.);
 
       gl_FragColor = vec4(vec3(light * - 1.), 1.);
     }
   `;
 
-  const shaderProgram = initShaderProgram(gl, vertexSource, fragmentSource);
+const fragmentSource_col = `
+  precision highp float;
+  precision highp sampler2D;
+
+  uniform vec2 u_resolution;
+  uniform float u_time;
+  uniform sampler2D u_bump_normal;
+
+  varying vec2 v_texture_coord;
+
+  void main() {
+    vec2 uv = gl_FragCoord.xy / u_resolution.xy;
+    float time = u_time * .001;
+    
+    float result = 0.0;
+    
+    for(int i = 0; i < 2; i++) {
+      float i_float = float(i);
+      vec2 pos;
+
+      pos.x = .5 + (sin(time + time * i_float * .5) * .5);
+      pos.y = .5 + (cos(time + time * i_float * .5) * .5);
+        
+      result += (1. - pow(length(uv - pos), 1.));
+    }
+  
+    vec2 bump = vec2(0.);
+    bump.x = texture2D(u_bump_normal, uv - vec2(.01, 0.)).r - texture2D(u_bump_normal, uv - vec2(-.01, 0.)).r;
+    bump.y = texture2D(u_bump_normal, uv - vec2(0., .01)).r - texture2D(u_bump_normal, uv - vec2(0., -.01)).r;
+
+    float light  = .1/(length(result - bump*1.5)) + 1.-length(result - bump*2.);
+
+    vec4 whiteGrad = vec4(vec3(light * - 1.), 1.);
+    vec4 blueGrad = vec4(0.0, 1.0, (light * - 1.), 1.);
+    
+    gl_FragColor = vec4(mix(whiteGrad, blueGrad, light));
+  }
+`;
+
+  const shaderProgram = initShaderProgram(gl, vertexSource, fragmentSource_col);
 
   const programInfo = {
     program: shaderProgram,
