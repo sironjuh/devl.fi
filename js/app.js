@@ -1,204 +1,201 @@
-const { random } = _;
+// Raymarching experiment number xxxxzzxvvc
+//
+// MDN WebGL tutorial used as a base for quick boilerplate
+// https://github.com/mdn/webgl-examples/blob/gh-pages/tutorial/sample2/webgl-demo.js
+//
+// Signed Distance Functions
+// https://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm
+//
+// Inspiration
+// https://www.iquilezles.org/www/articles/raymarchingdf/raymarchingdf.htm
 
-let w = innerWidth * devicePixelRatio,
-  h = innerHeight * devicePixelRatio,
-  noise,
-  particles,
-  rid,
-  cv = document.createElement("canvas"),
-  ctx = cv.getContext("2d");
+async function main() {
+  const canvas = document.querySelector('#glcanvas');
+  const gl = canvas.getContext('webgl');
+  const vertexSource = await fetchShader('js/vertex.glsl')
+  const fragmentSource = await fetchShader('js/fragment.glsl');
 
-cv.width = w;
-cv.height = h;
-cx = w / 2;
-cy = h / 2;
-tx = w - 60;
-ty = h - 25;
-fs = 15 * devicePixelRatio;
-
-class Vector {
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
+  if (!gl) {
+    console.error('Unable to initialize WebGL');
+    return;
   }
 
-  static fromPolar(r, t) {
-    return new Vector(r * Math.cos(t), r * Math.sin(t));
+  const shaderProgram = initShaderProgram(gl, vertexSource, fragmentSource);
+
+  const programInfo = {
+    program: shaderProgram,
+    attribLocations: {
+      vertexPosition: gl.getAttribLocation(shaderProgram, 'a_vertex_pos'),
+    },
+    uniformLocations: {
+      projectionMatrix: gl.getUniformLocation(shaderProgram, 'u_projection_mat'),
+      modelViewMatrix: gl.getUniformLocation(shaderProgram, 'u_modelview_mat'),
+      resolution: gl.getUniformLocation(shaderProgram, "u_resolution"),
+      time: gl.getUniformLocation(shaderProgram, 'u_time'),
+    },
+  };
+
+  const buffers = initBuffers(gl);
+
+  function render(now) {
+    drawScene(gl, programInfo, buffers, now);
+    requestAnimationFrame(render);
   }
 
-  add(v) {
-    this.x += v.x;
-    this.y += v.y;
-    return this;
+  render(Date.now());
+}
+
+function initBuffers(gl) {
+  const positionBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+
+  const positions = [
+     1.0,  1.0,
+    -1.0,  1.0,
+     1.0, -1.0,
+    -1.0, -1.0,
+  ];
+
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+
+  return {
+    position: positionBuffer,
+  };
+}
+
+function drawScene(gl, programInfo, buffers, time) {
+  resizeCanvasToDisplaySize(gl.canvas);
+  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+  gl.clearColor(0.0, 0.0, 0.0, 1.0);
+  gl.clearDepth(1.0);
+  gl.enable(gl.DEPTH_TEST);
+  gl.depthFunc(gl.LEQUAL);
+
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+  // Create a perspective matrix, a special matrix that is
+  // used to simulate the distortion of perspective in a camera.
+  const fieldOfView = 45 * Math.PI / 180;
+  const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+  const zNear = 0.1;
+  const zFar = 10.0;
+  const projectionMatrix = mat4.create();
+
+  // note: glmatrix.js always has the first argument
+  // as the destination to receive the result.
+  mat4.perspective(projectionMatrix,
+                   fieldOfView,
+                   aspect,
+                   zNear,
+                   zFar);
+
+  // Now move the drawing position a bit to where we want to
+  // start drawing the square.
+  const modelViewMatrix = mat4.create();
+
+  mat4.translate(modelViewMatrix,     // destination matrix
+                 modelViewMatrix,     // matrix to translate
+                 [0.0, 0.0, -0.2]);   // amount to translate
+
+  // Tell WebGL how to pull out the positions from the position
+  // buffer into the vertexPosition attribute.
+  {
+    const numComponents = 2;
+    const type = gl.FLOAT;
+    const normalize = false;
+    const stride = 0;
+    const offset = 0;
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
+
+    gl.vertexAttribPointer(
+        programInfo.attribLocations.vertexPosition,
+        numComponents,
+        type,
+        normalize,
+        stride,
+        offset);
+    gl.enableVertexAttribArray(
+        programInfo.attribLocations.vertexPosition);
   }
 
-  mul(x) {
-    this.x *= x;
-    this.y *= x;
-    return this;
-  }
+  gl.useProgram(programInfo.program);
 
-  dist(v) {
-    let dx, dy;
-    return Math.sqrt((dx = this.x - v.x) * dx, (dy = this.y - v.y) * dy);
-  }
+  // Shader uniforms
+  gl.uniform1f(programInfo.uniformLocations.time, (time * 0.001));
+  gl.uniform2f(programInfo.uniformLocations.resolution, gl.canvas.width, gl.canvas.height);
 
-  get mag() {
-    return Math.sqrt(this.x * this.x, this.y * this.y);
-  }
+  gl.uniformMatrix4fv(
+      programInfo.uniformLocations.projectionMatrix,
+      false,
+      projectionMatrix);
+  gl.uniformMatrix4fv(
+      programInfo.uniformLocations.modelViewMatrix,
+      false,
+      modelViewMatrix);
 
-  set mag(v) {
-    let n = this.norm();
-    this.x = n.x * v;
-    this.y = n.y * v;
-  }
-
-  norm() {
-    let mag = this.mag;
-    return new Vector(this.x / mag, this.y / mag);
+  {
+    const offset = 0;
+    const vertexCount = 4;
+    gl.drawArrays(gl.TRIANGLE_STRIP, offset, vertexCount);
   }
 }
 
-class Noise {
-  constructor(w, h, oct) {
-    this.width = w;
-    this.height = h;
-    this.octaves = oct;
-    this.canvas = Noise.compositeNoise(w, h, oct);
-    let ctx = this.canvas.getContext("2d");
-    this.data = ctx.getImageData(0, 0, w, h).data;
+function initShaderProgram(gl, vertexSource, fragmentSource) {
+  const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vertexSource);
+  const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fragmentSource);
+
+  const shaderProgram = gl.createProgram();
+  gl.attachShader(shaderProgram, vertexShader);
+  gl.attachShader(shaderProgram, fragmentShader);
+  gl.linkProgram(shaderProgram);
+
+  if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+    console.log('Unable to initialize the shader program: ' + gl.getProgramInfoLog(shaderProgram));
+    return null;
   }
 
-  // create w by h noise
-  static noise(w, h) {
-    let cv = document.createElement("canvas"),
-      ctx = cv.getContext("2d");
-
-    cv.width = w;
-    cv.height = h;
-
-    let img = ctx.getImageData(0, 0, w, h),
-      data = img.data;
-
-    for (let i = 0, l = data.length; i < l; i += 4) {
-      data[i + 0] = random(0, 255);
-      data[i + 1] = random(0, 255);
-      data[i + 2] = random(0, 255);
-      data[i + 3] = 255;
-    }
-
-    ctx.putImageData(img, 0, 0);
-    return cv;
-  }
-
-  // create composite noise with multiple octaves
-  static compositeNoise(w, h, oct) {
-    let cv = document.createElement("canvas"),
-      ctx = cv.getContext("2d");
-
-    cv.width = w;
-    cv.height = h;
-
-    ctx.fillStyle = "#000";
-    ctx.fillRect(0, 0, w, h);
-
-    ctx.globalCompositeOperation = "lighter";
-    ctx.globalAlpha = 1 / oct;
-
-    for (let i = 0; i < oct; i++) {
-      let noise = Noise.noise(w >> i, h >> i);
-      ctx.drawImage(noise, 0, 0, w, h);
-    }
-
-    return cv;
-  }
-
-  // returns noise from -1.0 to 1.0
-  getNoise(x, y, ch) {
-    // bitwise ~~ to floor
-    let i = (~~x + ~~y * this.width) * 4;
-    return this.data[i + ch] / 127 - 1;
-  }
+  return shaderProgram;
 }
 
-class Particle {
-  constructor(x, y, vx = 0, vy = 0) {
-    this.pos = new Vector(x, y);
-    this.vel = new Vector(vx, vy);
-    this.acc = new Vector(0, 0);
+function loadShader(gl, type, source) {
+  const shader = gl.createShader(type);
+
+  gl.shaderSource(shader, source);
+  gl.compileShader(shader);
+
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    alert('An error occurred compiling the shaders: ' + gl.getShaderInfoLog(shader));
+    gl.deleteShader(shader);
+    return null;
   }
 
-  update(noise) {
-    this.pos.add(this.vel);
-
-    let { x, y } = this.pos;
-    let dx = noise.getNoise(x, y, 0),
-      dy = noise.getNoise(x, y, 1);
-
-    this.vel.add(new Vector(dx, dy));
-    this.vel.mul(0.95);
-  }
-
-  draw(ctx) {
-    ctx.fillRect(this.pos.x, this.pos.y, 2, 2);
-  }
+  return shader;
 }
 
-function init() {
-  noise = new Noise(w, h, 8);
-  particles = [];
+async function fetchShader(shader) {
+  let response = await fetch(shader);
 
-  for (let i = 0; i < 36000; i++) {
-    let rad = ((Math.PI / 180) * i) / 1000;
-    let r1 = Math.sin(rad); // * Math.sin(rad) * Math.sin(rad));
-    let a1 = random(0, 2 * Math.PI, true);
-
-    //let r1 = w / 4,//random(w / 4 - 100, w / 4, true),
-    //let a1 = random(0, 2 * Math.PI, true);
-    let r2 = random(0, 1, true);
-    let a2 = random(0, 2 * Math.PI, true);
-
-    let pos = Vector.fromPolar(r1, a1),
-      vel = Vector.fromPolar(r2, a2);
-
-    pos.add(new Vector(w / 2, h / 2));
-
-    particles.push(new Particle(pos.x, pos.y, vel.x, vel.y));
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
   }
 
-  ctx.fillStyle = "#232323";
-  ctx.fillRect(0, 0, w, h);
-  ctx.textAlign = "right";
-  ctx.font = `${fs}pt Ubuntu`;
-  animate();
+  let content = await response.text();
+  return content;
 }
 
-// click once to pause, twice to regen
-function generate() {
-  if (rid) {
-    window.cancelAnimationFrame(rid);
-    rid = 0;
-  } else {
-    init();
+function resizeCanvasToDisplaySize(canvas) {
+  const displayWidth  = canvas.clientWidth;
+  const displayHeight = canvas.clientHeight;
+ 
+  const needResize = canvas.width  !== displayWidth ||
+                     canvas.height !== displayHeight;
+ 
+  if (needResize) {
+    canvas.width  = displayWidth;
+    canvas.height = displayHeight;
   }
+  return needResize;
 }
 
-function render() {
-  ctx.fillStyle = "rgba(64, 224, 208, 0.05)";
-  for (let p of particles) {
-    p.update(noise);
-    p.draw(ctx);
-  }
-}
-
-function animate() {
-  render();
-  rid = window.requestAnimationFrame(animate);
-}
-
-window.onload = function() {
-  document.body.appendChild(cv);
-  cv.addEventListener("mousedown", generate);
-  cv.addEventListener("touchstart", generate);
-  init();
-};
+main();

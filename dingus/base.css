@@ -7,5 +7,10 @@ canvas {
     left: 50%;
     transform: translate(-50%, -50%); 
 	width: 100%;
-	height: 80%;
+	height: 100%;
+}
+#fps {
+	position: absolute;
+	color:aliceblue;
+	z-index: 10;
 }

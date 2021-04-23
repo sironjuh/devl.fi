@@ -25,14 +25,11 @@ vec3 rotate(vec3 v, vec3 axis, float angle) {
 }
 
 float displacement(vec3 p) {
-    //float s = sin(u_time) * 1.75;
     return sin(2. * p.x) * sin(2. * p.y) * sin(2. * p.z);
-    //return sin(2. * p.x) * sin(2. * p.y) * sin(s * p.z);
-    //return sin(u_time * p.x) * sin(u_time * p.y) * sin(u_time * p.z);
 }
 
 float sdf(vec3 p) {
-    vec3 p1 = rotate(p, vec3(-1.), u_time / 2.);
+    vec3 p1 = rotate(p, vec3(sin(u_time), cos(u_time), 1.), u_time / 2.);
     float sphere = sdSphere(p1, 0.5);
     float d = displacement(p1);
     return sphere + d;
@@ -64,9 +61,8 @@ void main() {
         float h = sdf(currentPos);
 
         //float acc = 0.05 * (sin(u_time / 2.) + 1.0);
-
-        if(h < 0.001 || t > tMax) break; // decent static 0.001
         t += h;
+        if(h < 0.001 || t > tMax) break; // use acc for varying accuracy 0.001
     }
 
     vec3 color = vec3(.0625);

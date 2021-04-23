@@ -76,8 +76,12 @@ function drawScene(gl, programInfo, buffers, time) {
 
   // Create a perspective matrix, a special matrix that is
   // used to simulate the distortion of perspective in a camera.
-  const fieldOfView = 45 * Math.PI / 180; 
-  const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+  // Our field of view is 45 degrees, with a width/height
+  // ratio that matches the display size of the canvas
+  // and we only want to see objects between 0.1 units
+  // and 100 units away from the camera.
+  const fieldOfView = 45 * Math.PI / 180;   // in radians
+  const aspect = 1.75; //gl.canvas.clientWidth / gl.canvas.clientHeight;
   const zNear = 0.1;
   const zFar = 10.0;
   const projectionMatrix = mat4.create();
@@ -107,6 +111,9 @@ function drawScene(gl, programInfo, buffers, time) {
     const stride = 0;
     const offset = 0;
     gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
+
+    //const vao = gl.createVertexArray();
+    //gl.bindVertexArray(vao);
 
     gl.vertexAttribPointer(
         programInfo.attribLocations.vertexPosition,
@@ -185,13 +192,16 @@ async function fetchShader(shader) {
 }
 
 function resizeCanvasToDisplaySize(canvas) {
+  // Lookup the size the browser is displaying the canvas in CSS pixels.
   const displayWidth  = canvas.clientWidth;
   const displayHeight = canvas.clientHeight;
  
+  // Check if the canvas is not the same size.
   const needResize = canvas.width  !== displayWidth ||
                      canvas.height !== displayHeight;
  
   if (needResize) {
+    // Make the canvas the same size
     canvas.width  = displayWidth;
     canvas.height = displayHeight;
   }
@@ -200,3 +210,4 @@ function resizeCanvasToDisplaySize(canvas) {
 }
 
 main();
+
