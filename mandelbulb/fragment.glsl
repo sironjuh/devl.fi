@@ -58,9 +58,9 @@ vec3 calcNormal(in vec3 p) {
 
 void main() {
     float time = u_time / 4.23;
-    vec2 uv = gl_FragCoord.xy / u_resolution.xy;
+    vec2 uv = gl_FragCoord.xy / u_resolution.xy - vec2(.5);
     vec3 camPos = vec3(0., 0., 3. + 2. * sin(time));
-    vec3 ray = normalize(vec3((uv - vec2(.5)), -1));
+    vec3 ray = normalize(vec3(uv, -1.));
 
     // start from camera position
     vec3 rayPos = camPos;
@@ -68,8 +68,8 @@ void main() {
     float tMax = 15.;
     vec3 currentPos;
 
-    // limit to 256 iterations
-    for(int i = 0; i < 25; ++i) {
+    // limit to 25 iterations
+    for(int i = 0; i < 16; ++i) {
         currentPos = camPos + t * ray;
         float h = sdf(currentPos);
 
