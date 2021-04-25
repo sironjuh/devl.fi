@@ -12,8 +12,8 @@
 async function main() {
   const canvas = document.querySelector('#glcanvas');
   const gl = canvas.getContext('webgl');
-  const vertexSource = await fetchShader('js/vertex.glsl')
-  const fragmentSource = await fetchShader('js/fragment.glsl');
+  const vertexSource = await fetchShader('vertex.glsl')
+  const fragmentSource = await fetchShader('fragment.glsl');
 
   if (!gl) {
     console.error('Unable to initialize WebGL');
@@ -36,13 +36,18 @@ async function main() {
   };
 
   const buffers = initBuffers(gl);
+  let elapsed = Date.now();
+  let fps;
 
   function render(now) {
     drawScene(gl, programInfo, buffers, now);
+    fps = 1000 / (now - elapsed);
+    elapsed = now;
+    document.getElementById("fps").innerText = fps;
     requestAnimationFrame(render);
   }
 
-  render(Date.now());
+  requestAnimationFrame(render);
 }
 
 function initBuffers(gl) {
@@ -76,8 +81,12 @@ function drawScene(gl, programInfo, buffers, time) {
 
   // Create a perspective matrix, a special matrix that is
   // used to simulate the distortion of perspective in a camera.
-  const fieldOfView = 45 * Math.PI / 180;
-  const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+  // Our field of view is 45 degrees, with a width/height
+  // ratio that matches the display size of the canvas
+  // and we only want to see objects between 0.1 units
+  // and 100 units away from the camera.
+  const fieldOfView = 45 * Math.PI / 180;   // in radians
+  const aspect = 1.75; //gl.canvas.clientWidth / gl.canvas.clientHeight;
   const zNear = 0.1;
   const zFar = 10.0;
   const projectionMatrix = mat4.create();
@@ -194,9 +203,9 @@ function resizeCanvasToDisplaySize(canvas) {
   if (needResize) {
     canvas.width  = displayWidth;
     canvas.height = displayHeight;
-    console.log("resizing")
   }
   return needResize;
 }
 
 main();
+

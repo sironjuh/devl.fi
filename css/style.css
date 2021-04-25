@@ -4,10 +4,20 @@ html, body {
   overflow: hidden;
   margin: 0;
 }
-  
+
 canvas {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); 
   width: 100%;
   height: 100%;
+}
+
+#fps {
+  position: absolute;
+  color:aliceblue;
+  z-index: 10;
 }
 
 @keyframes show-info {
@@ -24,10 +34,14 @@ canvas {
   font-size: 12px;
   opacity: 0.8;
   color: #fff;
-  width: 240px;
+  width: min(400px, calc(100%/2));
   left: 0px;
   top: 20px;
-  z-index: 100;
+  z-index: 5;
+}
+
+.info img {
+  max-width:100%;
 }
 
 .info:hover {

@@ -11,7 +11,7 @@
 
 async function main() {
   const canvas = document.querySelector('#glcanvas');
-  const gl = canvas.getContext('webgl2');
+  const gl = canvas.getContext('webgl');
   const vertexSource = await fetchShader('vertex.glsl')
   const fragmentSource = await fetchShader('fragment.glsl');
 
@@ -66,7 +66,7 @@ function initBuffers(gl) {
 function drawScene(gl, programInfo, buffers, time) {
   resizeCanvasToDisplaySize(gl.canvas);
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-  
+
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.clearDepth(1.0);
   gl.enable(gl.DEPTH_TEST);
@@ -76,11 +76,7 @@ function drawScene(gl, programInfo, buffers, time) {
 
   // Create a perspective matrix, a special matrix that is
   // used to simulate the distortion of perspective in a camera.
-  // Our field of view is 45 degrees, with a width/height
-  // ratio that matches the display size of the canvas
-  // and we only want to see objects between 0.1 units
-  // and 100 units away from the camera.
-  const fieldOfView = 75 * Math.PI / 180;   // in radians
+  const fieldOfView = 45 * Math.PI / 180; 
   const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
   const zNear = 0.1;
   const zFar = 10.0;
@@ -112,9 +108,6 @@ function drawScene(gl, programInfo, buffers, time) {
     const offset = 0;
     gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
 
-    const vao = gl.createVertexArray();
-    gl.bindVertexArray(vao);
-
     gl.vertexAttribPointer(
         programInfo.attribLocations.vertexPosition,
         numComponents,
@@ -129,7 +122,7 @@ function drawScene(gl, programInfo, buffers, time) {
   gl.useProgram(programInfo.program);
 
   // Shader uniforms
-  gl.uniform1f(programInfo.uniformLocations.time, time);
+  gl.uniform1f(programInfo.uniformLocations.time, (time * 0.001));
   gl.uniform2f(programInfo.uniformLocations.resolution, gl.canvas.width, gl.canvas.height);
 
   gl.uniformMatrix4fv(
@@ -192,16 +185,13 @@ async function fetchShader(shader) {
 }
 
 function resizeCanvasToDisplaySize(canvas) {
-  // Lookup the size the browser is displaying the canvas in CSS pixels.
   const displayWidth  = canvas.clientWidth;
   const displayHeight = canvas.clientHeight;
  
-  // Check if the canvas is not the same size.
   const needResize = canvas.width  !== displayWidth ||
                      canvas.height !== displayHeight;
  
   if (needResize) {
-    // Make the canvas the same size
     canvas.width  = displayWidth;
     canvas.height = displayHeight;
   }
@@ -210,4 +200,3 @@ function resizeCanvasToDisplaySize(canvas) {
 }
 
 main();
-
