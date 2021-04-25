@@ -32,8 +32,8 @@ float displacement(vec3 p) {
 float sdf(vec3 p) {
     vec3 p1 = rotate(p, vec3(sin(u_time), cos(u_time), 1.), u_time / 2.);
     float sphere = sdSphere(p1, vec3(0.), 0.5);
-    float d = clamp(displacement(p1 - vec3(0.)), -5., .2);
-    return sphere + d;
+    float d = displacement(p1 - vec3(0.));
+    return mix(sphere, d, 0.5); 
 }
 
 // https://www.iquilezles.org/www/articles/normalsSDF/normalsSDF.htm
@@ -48,7 +48,7 @@ vec3 calcNormal(in vec3 p) {
 void main() {
     vec2 uv = (gl_FragCoord.xy / u_resolution.xy) - vec2(.5);
     // uv.x *= u_resolution.x / u_resolution.y; // correct aspect ratio
-    vec3 camPos = vec3(0., 0., 1.5);
+    vec3 camPos = vec3(0., 0., 1.8);
     vec3 ray = normalize(vec3(uv, -1));
 
     // start from camera position
@@ -57,13 +57,12 @@ void main() {
     float tMax = 5.;
     vec3 currentPos;
 
-    // raymarch, limit to 64 iterations
-    for(int i = 0; i < 64; ++i) {
+    // raymarch, limit to 100 iterations
+    for(int i = 0; i < 100; ++i) {
         currentPos = camPos + t * ray;
         float h = sdf(currentPos);
-
-        if(h < 0.001 || t > tMax) break;
         t += h;
+        if(h < 0.0001 || t > tMax) break;
     }
 
     // add some gradient on background
