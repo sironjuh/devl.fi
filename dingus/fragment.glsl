@@ -29,7 +29,7 @@ float displacement(vec3 p) {
 }
 
 float sdf(vec3 p) {
-    vec3 p1 = rotate(p, vec3(sin(u_time), cos(u_time), 1.), u_time / 2.);
+    vec3 p1 = rotate(p, vec3(-1.), u_time / 2.);
     float sphere = sdSphere(p1, 0.5);
     float d = displacement(p1);
     return sphere + d;

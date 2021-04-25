@@ -194,6 +194,7 @@ function resizeCanvasToDisplaySize(canvas) {
   if (needResize) {
     canvas.width  = displayWidth;
     canvas.height = displayHeight;
+    console.log("resizing")
   }
   return needResize;
 }

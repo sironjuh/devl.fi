@@ -3,8 +3,9 @@ precision highp float;
 uniform vec2 u_resolution;
 uniform float u_time;
 
-float sdSphere(vec3 point, float radius) {
-    return length(point) - radius;
+float sdSphere(vec3 p, vec3 pos, float radius) {
+    p -= pos;
+    return length(p) - radius;
 }
 
 mat4 rotationMatrix(vec3 axis, float angle) {
@@ -30,14 +31,14 @@ float displacement(vec3 p) {
 
 float sdf(vec3 p) {
     vec3 p1 = rotate(p, vec3(sin(u_time), cos(u_time), 1.), u_time / 2.);
-    float sphere = sdSphere(p1, 0.5);
-    float d = displacement(p1);
+    float sphere = sdSphere(p1, vec3(0.), 0.5);
+    float d = clamp(displacement(p1 - vec3(0.)), -5., .2);
     return sphere + d;
 }
 
 // https://www.iquilezles.org/www/articles/normalsSDF/normalsSDF.htm
 vec3 calcNormal(in vec3 p) {
-    const float eps = 0.0001;
+    const float eps = 0.001;
     const vec2 h = vec2(eps,0);
     return normalize(vec3(sdf(p+h.xyy) - sdf(p-h.xyy),
                           sdf(p+h.yxy) - sdf(p-h.yxy),
@@ -45,27 +46,28 @@ vec3 calcNormal(in vec3 p) {
 }
 
 void main() {
-    vec2 uv = gl_FragCoord.xy / u_resolution.xy;
+    vec2 uv = (gl_FragCoord.xy / u_resolution.xy) - vec2(.5);
+    // uv.x *= u_resolution.x / u_resolution.y; // correct aspect ratio
     vec3 camPos = vec3(0., 0., 1.5);
-    vec3 ray = normalize(vec3((uv - vec2(.5)), -1));
+    vec3 ray = normalize(vec3(uv, -1));
 
     // start from camera position
     vec3 rayPos = camPos;
     float t = 0.;
-    float tMax = 3.;
+    float tMax = 5.;
     vec3 currentPos;
 
-    // limit to 128 iterations
-    for(int i = 0; i < 128; ++i) {
+    // raymarch, limit to 64 iterations
+    for(int i = 0; i < 64; ++i) {
         currentPos = camPos + t * ray;
         float h = sdf(currentPos);
 
-        //float acc = 0.05 * (sin(u_time / 2.) + 1.0);
+        if(h < 0.001 || t > tMax) break;
         t += h;
-        if(h < 0.001 || t > tMax) break; // use acc for varying accuracy 0.001
     }
 
-    vec3 color = vec3(.0625);
+    // add some gradient on background
+    vec3 color = vec3(.5 - length(uv - vec2(0.))); // .00625
 
     if(t < tMax) {
         vec3 normal = calcNormal(currentPos);

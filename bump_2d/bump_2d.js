@@ -158,6 +158,9 @@ function initBuffers(gl) {
 }
 
 function drawScene(gl, programInfo, buffers, normal, time) {
+  resizeCanvasToDisplaySize(gl.canvas);
+  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+  
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.clearDepth(1.0);
   gl.enable(gl.DEPTH_TEST);
@@ -339,6 +342,21 @@ function loadTexture(gl, url) {
 
 function isPowerOf2(value) {
   return (value & (value - 1)) == 0;
+}
+
+function resizeCanvasToDisplaySize(canvas) {
+  const displayWidth  = canvas.clientWidth;
+  const displayHeight = canvas.clientHeight;
+ 
+  const needResize = canvas.width  !== displayWidth ||
+                     canvas.height !== displayHeight;
+ 
+  if (needResize) {
+    canvas.width  = displayWidth;
+    canvas.height = displayHeight;
+    console.log("resizing")
+  }
+  return needResize;
 }
 
 main();
