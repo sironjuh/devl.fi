@@ -1,4 +1,4 @@
-precision mediump float;
+precision highp float;
 
 uniform vec2 u_resolution;
 uniform float u_time;
@@ -68,7 +68,7 @@ void main() {
     float tMax = 15.;
     vec3 currentPos;
 
-    // limit to 25 iterations
+    // limit to 16 iterations
     for(int i = 0; i < 16; ++i) {
         currentPos = camPos + t * ray;
         float h = sdf(currentPos);
@@ -81,16 +81,15 @@ void main() {
 
     if(t < tMax) {
         vec3 normal = calcNormal(currentPos);
-        //color = vec3(normal);
 
-        vec3 mat = vec3( .5, .1, .3 ); 
- 	    vec3 light = vec3( .5, .5, -2.0 );
-	    vec3 lightCol = vec3(.6, .4, .5);
+        vec3 mat = vec3(.5, .1, .3); 
+        vec3 light = vec3(.5, .5, -2.);
+        vec3 lightCol = vec3(.6, .4, .5);
 	
-	    vec3 ldir = normalize(light - currentPos);
-  	    vec3 diff = dot(ldir, normal) * lightCol * 55.;
+        vec3 lightDir = normalize(light - currentPos);
+        vec3 diff = dot(lightDir, normal) * lightCol * 55.;
 	
-	    color = diff * mat;
+        color = diff * mat;
     }
 
     gl_FragColor = vec4(color, 1.);
