@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+
+    <meta name="og:title" content="Mandelbulb">
+    <meta name="og:description" content="First try on mandelbulb">
+    <meta name="og:image" content="https://www.devl.fi/mandelbulb/preview.jpg">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:domain" content="devl.fi">
+    <meta name="twitter:title" content="Mandelbulb">
+    <meta name="twitter:description" content="First try on mandelbulb">
+    <meta name="twitter:image" content="https://www.devl.fi/mandelbulb/preview.jpg">
+
+    <title>Mandelbulb</title>
+    <link rel="stylesheet" href="./base.css" type="text/css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"
+            integrity="sha512-zhHQR0/H5SEBL3Wn6yYSaTTZej12z0hVZKOv3TwCUXT1z5qeqGcXJLLrbERYRScEDDpYIJhPC1fk31gqR783iQ=="
+            crossorigin="anonymous" defer>
+    </script>
+    <script src="app.js" defer></script>
+  </head>
+
+  <body>
+    <div id="renderer">
+      <div id="details"></div>
+      <div class="buttons">
+        <button>360p</button>
+        <button>480p</button>
+        <button>576p</button>
+        <button>720p</button>
+        <button>1080p</button>
+      </div>
+      <div id="info"></div>
+    </div>
+    <canvas id="glcanvas"></canvas>
+  </body>
+</html>
