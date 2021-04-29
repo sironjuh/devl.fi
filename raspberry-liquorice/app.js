@@ -76,13 +76,12 @@ async function main() {
 
   if(potato) {
     details.append('⚠️ Warning! Your GPU might be a 🥔');
-    alert('⚠️ Warning!\nBrowser is using Intel/Apple GPU as a WebGL backend.\nExperience might not be very fluid');
   }
   
-  const shaderProgram = initShaderProgram(gl, vertexSource, fragmentSource);
-
   addOnClickHandlers();
   updateResolutionInfo();
+
+  const shaderProgram = initShaderProgram(gl, vertexSource, fragmentSource);
 
   const programInfo = {
     program: shaderProgram,
@@ -103,8 +102,7 @@ async function main() {
     drawScene(gl, programInfo, buffers, now);
     requestAnimationFrame(render);
   }
-
-  requestAnimationFrame(render);
+  render(Date.now());
 }
 
 function initBuffers(gl) {
@@ -139,7 +137,7 @@ function drawScene(gl, programInfo, buffers, time) {
   // Create a perspective matrix, a special matrix that is
   // used to simulate the distortion of perspective in a camera.
   const fieldOfView = 45 * Math.PI / 180;   // in radians
-  const aspect = 1.75; //gl.canvas.clientWidth / gl.canvas.clientHeight;
+  const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
   const zNear = 0.1;
   const zFar = 10.0;
   const projectionMatrix = mat4.create();
