@@ -197,7 +197,7 @@ function animate() {
   rid = window.requestAnimationFrame(animate);
 }
 
-window.onload = function() {
+window.onload = function () {
   document.body.appendChild(cv);
   cv.addEventListener("mousedown", generate);
   cv.addEventListener("touchstart", generate);

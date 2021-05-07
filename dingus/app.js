@@ -10,13 +10,13 @@
 // https://www.iquilezles.org/www/articles/raymarchingdf/raymarchingdf.htm
 
 async function main() {
-  const canvas = document.querySelector('#glcanvas');
-  const gl = canvas.getContext('webgl');
-  const vertexSource = await fetchShader('vertex.glsl')
-  const fragmentSource = await fetchShader('fragment.glsl');
+  const canvas = document.querySelector("#glcanvas");
+  const gl = canvas.getContext("webgl");
+  const vertexSource = await fetchShader("vertex.glsl");
+  const fragmentSource = await fetchShader("fragment.glsl");
 
   if (!gl) {
-    console.error('Unable to initialize WebGL');
+    console.error("Unable to initialize WebGL");
     return;
   }
 
@@ -25,13 +25,13 @@ async function main() {
   const programInfo = {
     program: shaderProgram,
     attribLocations: {
-      vertexPosition: gl.getAttribLocation(shaderProgram, 'a_vertex_pos'),
+      vertexPosition: gl.getAttribLocation(shaderProgram, "a_vertex_pos"),
     },
     uniformLocations: {
-      projectionMatrix: gl.getUniformLocation(shaderProgram, 'u_projection_mat'),
-      modelViewMatrix: gl.getUniformLocation(shaderProgram, 'u_modelview_mat'),
+      projectionMatrix: gl.getUniformLocation(shaderProgram, "u_projection_mat"),
+      modelViewMatrix: gl.getUniformLocation(shaderProgram, "u_modelview_mat"),
       resolution: gl.getUniformLocation(shaderProgram, "u_resolution"),
-      time: gl.getUniformLocation(shaderProgram, 'u_time'),
+      time: gl.getUniformLocation(shaderProgram, "u_time"),
     },
   };
 
@@ -54,12 +54,7 @@ function initBuffers(gl) {
   const positionBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
-  const positions = [
-     1.0,  1.0,
-    -1.0,  1.0,
-     1.0, -1.0,
-    -1.0, -1.0,
-  ];
+  const positions = [1.0, 1.0, -1.0, 1.0, 1.0, -1.0, -1.0, -1.0];
 
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
 
@@ -85,7 +80,7 @@ function drawScene(gl, programInfo, buffers, time) {
   // ratio that matches the display size of the canvas
   // and we only want to see objects between 0.1 units
   // and 100 units away from the camera.
-  const fieldOfView = 45 * Math.PI / 180;   // in radians
+  const fieldOfView = (45 * Math.PI) / 180; // in radians
   const aspect = 1.75; //gl.canvas.clientWidth / gl.canvas.clientHeight;
   const zNear = 0.1;
   const zFar = 10.0;
@@ -93,19 +88,17 @@ function drawScene(gl, programInfo, buffers, time) {
 
   // note: glmatrix.js always has the first argument
   // as the destination to receive the result.
-  mat4.perspective(projectionMatrix,
-                   fieldOfView,
-                   aspect,
-                   zNear,
-                   zFar);
+  mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
 
   // Now move the drawing position a bit to where we want to
   // start drawing the square.
   const modelViewMatrix = mat4.create();
 
-  mat4.translate(modelViewMatrix,     // destination matrix
-                 modelViewMatrix,     // matrix to translate
-                 [0.0, 0.0, -0.2]);   // amount to translate
+  mat4.translate(
+    modelViewMatrix, // destination matrix
+    modelViewMatrix, // matrix to translate
+    [0.0, 0.0, -0.2]
+  ); // amount to translate
 
   // Tell WebGL how to pull out the positions from the position
   // buffer into the vertexPosition attribute.
@@ -117,31 +110,18 @@ function drawScene(gl, programInfo, buffers, time) {
     const offset = 0;
     gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
 
-    gl.vertexAttribPointer(
-        programInfo.attribLocations.vertexPosition,
-        numComponents,
-        type,
-        normalize,
-        stride,
-        offset);
-    gl.enableVertexAttribArray(
-        programInfo.attribLocations.vertexPosition);
+    gl.vertexAttribPointer(programInfo.attribLocations.vertexPosition, numComponents, type, normalize, stride, offset);
+    gl.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
   }
 
   gl.useProgram(programInfo.program);
 
   // Shader uniforms
-  gl.uniform1f(programInfo.uniformLocations.time, (time * 0.001));
+  gl.uniform1f(programInfo.uniformLocations.time, time * 0.001);
   gl.uniform2f(programInfo.uniformLocations.resolution, gl.canvas.width, gl.canvas.height);
 
-  gl.uniformMatrix4fv(
-      programInfo.uniformLocations.projectionMatrix,
-      false,
-      projectionMatrix);
-  gl.uniformMatrix4fv(
-      programInfo.uniformLocations.modelViewMatrix,
-      false,
-      modelViewMatrix);
+  gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
+  gl.uniformMatrix4fv(programInfo.uniformLocations.modelViewMatrix, false, modelViewMatrix);
 
   {
     const offset = 0;
@@ -160,7 +140,7 @@ function initShaderProgram(gl, vertexSource, fragmentSource) {
   gl.linkProgram(shaderProgram);
 
   if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-    console.log('Unable to initialize the shader program: ' + gl.getProgramInfoLog(shaderProgram));
+    console.log("Unable to initialize the shader program: " + gl.getProgramInfoLog(shaderProgram));
     return null;
   }
 
@@ -174,7 +154,7 @@ function loadShader(gl, type, source) {
   gl.compileShader(shader);
 
   if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    alert('An error occurred compiling the shaders: ' + gl.getShaderInfoLog(shader));
+    alert("An error occurred compiling the shaders: " + gl.getShaderInfoLog(shader));
     gl.deleteShader(shader);
     return null;
   }
@@ -194,18 +174,16 @@ async function fetchShader(shader) {
 }
 
 function resizeCanvasToDisplaySize(canvas) {
-  const displayWidth  = canvas.clientWidth;
+  const displayWidth = canvas.clientWidth;
   const displayHeight = canvas.clientHeight;
- 
-  const needResize = canvas.width  !== displayWidth ||
-                     canvas.height !== displayHeight;
- 
+
+  const needResize = canvas.width !== displayWidth || canvas.height !== displayHeight;
+
   if (needResize) {
-    canvas.width  = displayWidth;
+    canvas.width = displayWidth;
     canvas.height = displayHeight;
   }
   return needResize;
 }
 
 main();
-

@@ -1,21 +1,22 @@
-html, body {
+html,
+body {
   background: #111;
   overflow: hidden;
   margin: 0;
 }
-  
+
 canvas {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%); 
+  transform: translate(-50%, -50%);
   width: 100%;
   height: 100%;
 }
-  
+
 #fps {
   position: absolute;
-  color:aliceblue;
+  color: aliceblue;
   z-index: 5;
 }
 
@@ -26,7 +27,7 @@ canvas {
   color: #fff;
   right: 0px;
   bottom: 40px;
-  background: rgba(0,0,0,0.8);
+  background: rgba(0, 0, 0, 0.8);
   padding: 15px 20px;
   z-index: 10;
 }

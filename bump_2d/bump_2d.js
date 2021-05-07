@@ -4,11 +4,11 @@
 // https://github.com/mdn/webgl-examples/blob/gh-pages/tutorial/sample2/webgl-demo.js
 
 function main() {
-  const canvas = document.querySelector('#glcanvas');
-  const gl = canvas.getContext('webgl');
-  
+  const canvas = document.querySelector("#glcanvas");
+  const gl = canvas.getContext("webgl");
+
   if (!gl) {
-    console.error('Unable to initialize WebGL');
+    console.error("Unable to initialize WebGL");
     return;
   }
 
@@ -63,7 +63,7 @@ function main() {
     }
   `;
 
-const fragmentSource_col = `
+  const fragmentSource_col = `
   precision highp float;
   precision highp sampler2D;
 
@@ -107,20 +107,20 @@ const fragmentSource_col = `
   const programInfo = {
     program: shaderProgram,
     attribLocations: {
-      vertexPosition: gl.getAttribLocation(shaderProgram, 'a_vertex_pos'),
-      texturePosition: gl.getAttribLocation(shaderProgram, 'a_texture_pos'),
+      vertexPosition: gl.getAttribLocation(shaderProgram, "a_vertex_pos"),
+      texturePosition: gl.getAttribLocation(shaderProgram, "a_texture_pos"),
     },
     uniformLocations: {
-      projectionMatrix: gl.getUniformLocation(shaderProgram, 'u_projection_mat'),
-      modelViewMatrix: gl.getUniformLocation(shaderProgram, 'u_modelview_mat'),
-      resolution: gl.getUniformLocation(shaderProgram, 'u_resolution'),
-      time: gl.getUniformLocation(shaderProgram, 'u_time'),
-      bumpNormal: gl.getUniformLocation(shaderProgram, 'u_bump_normal'),
+      projectionMatrix: gl.getUniformLocation(shaderProgram, "u_projection_mat"),
+      modelViewMatrix: gl.getUniformLocation(shaderProgram, "u_modelview_mat"),
+      resolution: gl.getUniformLocation(shaderProgram, "u_resolution"),
+      time: gl.getUniformLocation(shaderProgram, "u_time"),
+      bumpNormal: gl.getUniformLocation(shaderProgram, "u_bump_normal"),
     },
   };
 
   const buffers = initBuffers(gl);
-  const bump_normal = loadTexture(gl, 'bump_normal.png');
+  const bump_normal = loadTexture(gl, "bump_normal.png");
 
   function render(now) {
     drawScene(gl, programInfo, buffers, bump_normal, now);
@@ -134,22 +134,13 @@ function initBuffers(gl) {
   const positionBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
-  const positions = [
-     1.0,  1.0,
-    -1.0,  1.0,
-     1.0, -1.0,
-    -1.0, -1.0,
-  ];
+  const positions = [1.0, 1.0, -1.0, 1.0, 1.0, -1.0, -1.0, -1.0];
 
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
 
   const texPosBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, texPosBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-    1.0,  1.0,
-    -1.0,  1.0,
-     1.0, -1.0,
-    -1.0, -1.0,]), gl.STATIC_DRAW);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([1.0, 1.0, -1.0, 1.0, 1.0, -1.0, -1.0, -1.0]), gl.STATIC_DRAW);
 
   return {
     position: positionBuffer,
@@ -160,7 +151,7 @@ function initBuffers(gl) {
 function drawScene(gl, programInfo, buffers, normal, time) {
   resizeCanvasToDisplaySize(gl.canvas);
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-  
+
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.clearDepth(1.0);
   gl.enable(gl.DEPTH_TEST);
@@ -174,7 +165,7 @@ function drawScene(gl, programInfo, buffers, normal, time) {
   // ratio that matches the display size of the canvas
   // and we only want to see objects between 0.1 units
   // and 100 units away from the camera.
-  const fieldOfView = 45 * Math.PI / 180;   // in radians
+  const fieldOfView = (45 * Math.PI) / 180; // in radians
   const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
   const zNear = 0.1;
   const zFar = 100.0;
@@ -182,19 +173,17 @@ function drawScene(gl, programInfo, buffers, normal, time) {
 
   // note: glmatrix.js always has the first argument
   // as the destination to receive the result.
-  mat4.perspective(projectionMatrix,
-                   fieldOfView,
-                   aspect,
-                   zNear,
-                   zFar);
+  mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
 
   // Now move the drawing position a bit to where we want to
   // start drawing the square.
   const modelViewMatrix = mat4.create();
 
-  mat4.translate(modelViewMatrix,     // destination matrix
-                 modelViewMatrix,     // matrix to translate
-                 [-0.0, 0.0, -0.1]);  // amount to translate
+  mat4.translate(
+    modelViewMatrix, // destination matrix
+    modelViewMatrix, // matrix to translate
+    [-0.0, 0.0, -0.1]
+  ); // amount to translate
 
   // Tell WebGL how to pull out the positions from the position
   // buffer into the vertexPosition attribute.
@@ -205,15 +194,8 @@ function drawScene(gl, programInfo, buffers, normal, time) {
     const stride = 0;
     const offset = 0;
     gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
-    gl.vertexAttribPointer(
-        programInfo.attribLocations.vertexPosition,
-        numComponents,
-        type,
-        normalize,
-        stride,
-        offset);
-    gl.enableVertexAttribArray(
-        programInfo.attribLocations.vertexPosition);
+    gl.vertexAttribPointer(programInfo.attribLocations.vertexPosition, numComponents, type, normalize, stride, offset);
+    gl.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
   }
 
   // Tell WebGL how to pull out the texture coordinates from
@@ -225,15 +207,8 @@ function drawScene(gl, programInfo, buffers, normal, time) {
     const stride = 0;
     const offset = 0;
     gl.bindBuffer(gl.ARRAY_BUFFER, buffers.texturePosition);
-    gl.vertexAttribPointer(
-        programInfo.attribLocations.texturePosition,
-        numComponents,
-        type,
-        normalize,
-        stride,
-        offset);
-    gl.enableVertexAttribArray(
-        programInfo.attribLocations.texturePosition);
+    gl.vertexAttribPointer(programInfo.attribLocations.texturePosition, numComponents, type, normalize, stride, offset);
+    gl.enableVertexAttribArray(programInfo.attribLocations.texturePosition);
   }
 
   gl.useProgram(programInfo.program);
@@ -247,14 +222,8 @@ function drawScene(gl, programInfo, buffers, normal, time) {
   gl.uniform1f(programInfo.uniformLocations.time, time);
   gl.uniform2f(programInfo.uniformLocations.resolution, gl.canvas.width, gl.canvas.height);
 
-  gl.uniformMatrix4fv(
-      programInfo.uniformLocations.projectionMatrix,
-      false,
-      projectionMatrix);
-  gl.uniformMatrix4fv(
-      programInfo.uniformLocations.modelViewMatrix,
-      false,
-      modelViewMatrix);
+  gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
+  gl.uniformMatrix4fv(programInfo.uniformLocations.modelViewMatrix, false, modelViewMatrix);
 
   {
     const offset = 0;
@@ -273,7 +242,7 @@ function initShaderProgram(gl, vertexSource, fragmentSource) {
   gl.linkProgram(shaderProgram);
 
   if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-    console.log('Unable to initialize the shader program: ' + gl.getProgramInfoLog(shaderProgram));
+    console.log("Unable to initialize the shader program: " + gl.getProgramInfoLog(shaderProgram));
     return null;
   }
 
@@ -287,7 +256,7 @@ function loadShader(gl, type, source) {
   gl.compileShader(shader);
 
   if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    alert('An error occurred compiling the shaders: ' + gl.getShaderInfoLog(shader));
+    alert("An error occurred compiling the shaders: " + gl.getShaderInfoLog(shader));
     gl.deleteShader(shader);
     return null;
   }
@@ -311,28 +280,25 @@ function loadTexture(gl, url) {
   const border = 0;
   const srcFormat = gl.RGBA;
   const srcType = gl.UNSIGNED_BYTE;
-  const pixel = new Uint8Array([0, 0, 255, 255]);  // opaque blue
-  gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
-                width, height, border, srcFormat, srcType,
-                pixel);
+  const pixel = new Uint8Array([0, 0, 255, 255]); // opaque blue
+  gl.texImage2D(gl.TEXTURE_2D, level, internalFormat, width, height, border, srcFormat, srcType, pixel);
 
   const image = new Image();
-  image.onload = function() {
+  image.onload = function () {
     gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
-                  srcFormat, srcType, image);
+    gl.texImage2D(gl.TEXTURE_2D, level, internalFormat, srcFormat, srcType, image);
 
     // WebGL1 has different requirements for power of 2 images
     // vs non power of 2 images so check if the image is a
     // power of 2 in both dimensions.
     if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
-       gl.generateMipmap(gl.TEXTURE_2D);
-       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.generateMipmap(gl.TEXTURE_2D);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     } else {
-       // not a power of 2. Turn off mips and set wrapping to clamp to edge
-       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      // not a power of 2. Turn off mips and set wrapping to clamp to edge
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     }
   };
   image.src = url;
@@ -345,16 +311,15 @@ function isPowerOf2(value) {
 }
 
 function resizeCanvasToDisplaySize(canvas) {
-  const displayWidth  = canvas.clientWidth;
+  const displayWidth = canvas.clientWidth;
   const displayHeight = canvas.clientHeight;
- 
-  const needResize = canvas.width  !== displayWidth ||
-                     canvas.height !== displayHeight;
- 
+
+  const needResize = canvas.width !== displayWidth || canvas.height !== displayHeight;
+
   if (needResize) {
-    canvas.width  = displayWidth;
+    canvas.width = displayWidth;
     canvas.height = displayHeight;
-    console.log("resizing")
+    console.log("resizing");
   }
   return needResize;
 }

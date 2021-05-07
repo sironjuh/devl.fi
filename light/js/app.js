@@ -1,20 +1,20 @@
 let canvas_w = 640,
-    canvas_h = 360,
-    cv = document.createElement("canvas"),
-    ctx = cv.getContext("2d");
-    cv.width = canvas_w;
-    cv.height = canvas_h;
-    cx = canvas_w / 2;
-    cy = canvas_h / 2;
+  canvas_h = 360,
+  cv = document.createElement("canvas"),
+  ctx = cv.getContext("2d");
+cv.width = canvas_w;
+cv.height = canvas_h;
+cx = canvas_w / 2;
+cy = canvas_h / 2;
 
 let light_w = 64,
-    light_h = 64,
-    light = new Uint8Array(light_w * light_h);
+  light_h = 64,
+  light = new Uint8Array(light_w * light_h);
 
 let start_x = 320 - 96,
-    start_y = 180 - 64,
-    angle = 0,    
-    rid = null;
+  start_y = 180 - 64,
+  angle = 0,
+  rid = null;
 
 function distance(x1, y1, x2, y2) {
   return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
@@ -46,7 +46,7 @@ function renderLight(pos_x, pos_y) {
 }
 
 function updateCoordinates() {
-  angle = angle + .05;
+  angle = angle + 0.05;
   start_x = start_x + Math.sin(angle);
   start_y = start_y + Math.cos(angle);
 }
@@ -81,7 +81,7 @@ function pauseRestart() {
   }
 }
 
-window.onload = function() {
+window.onload = function () {
   document.body.appendChild(cv);
   cv.addEventListener("mousedown", pauseRestart);
   init();
