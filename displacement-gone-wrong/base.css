@@ -3,6 +3,7 @@ body {
   background: #111;
   overflow: hidden;
   margin: 0;
+  font-family: "Poppins", sans-serif;
 }
 
 canvas {
@@ -14,20 +15,16 @@ canvas {
   height: 100%;
 }
 
-#fps {
-  position: absolute;
-  color: aliceblue;
-  z-index: 10;
-}
-
-.info {
-  font-family: "Poppins", sans-serif;
+header {
   background: rgba(0, 0, 0, 0.8);
-  padding: 0 20px;
   position: absolute;
   opacity: 0.99;
-  color: #fff;
-  left: 0px;
-  top: 20px;
+  left: 0;
+  top: 2rem;
   z-index: 5;
+}
+
+h2 {
+  padding: 0 2rem;
+  color: #fff;
 }

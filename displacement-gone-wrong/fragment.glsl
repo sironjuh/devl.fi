@@ -7,7 +7,6 @@ float sdSphere(vec3 point, float radius) {
     return length(point) - radius;
 }
 
-
 float displacement(vec3 p) {
     return sin(u_time * p.x) * sin(u_time * p.y) * sin(u_time * p.z);
 }
@@ -30,32 +29,30 @@ vec3 calcNormal(in vec3 p) {
 void main() {
     vec2 uv = gl_FragCoord.xy / u_resolution.xy;
     vec3 camPos = vec3(0., 0., 2.);
-    vec3 ray = normalize(vec3((uv - vec2(.5)), -1));
+    vec3 rayDir = normalize(vec3((uv - vec2(.5)), -1));
 
     // start from camera position
     vec3 rayPos = camPos;
-    float t = 0.;
-    float tMax = 5.;
+    float dist = 0.;
+    float distMax = 5.;
     vec3 currentPos;
 
-    // limit to 256 iterations
-    for(int i = 0; i < 256; ++i) {
-        currentPos = camPos + t * ray;
+    // limit raymarch to 256 iterations
+    for(int i = 0; i < 256; i++) {
+        currentPos = camPos + dist * rayDir;
         float h = sdf(currentPos);
-
-        if(h < 0.0001 || t > tMax) break;
-        t += h;
+        dist += h;
+        if(h < 0.0001 || dist > distMax) break;
     }
 
     vec3 color = vec3(0.);
 
-    if(t < tMax) {
+    if(dist < distMax) {
         vec3 normal = calcNormal(currentPos);
-        //color = vec3(normal);
 
-        // directional light
-        float diff = dot(vec3(1.), normal);
-        color = vec3(diff);
+        // diffuse light
+        float diffuse = dot(vec3(1.), normal);
+        color = vec3(diffuse);
     }
 
     gl_FragColor = vec4(color, 1.);
