@@ -2,6 +2,7 @@ html,
 body {
   font-family: "Ubuntu", sans-serif;
   background: #111;
+  color: #fff;
   overflow: hidden;
   margin: 0;
 }
@@ -15,12 +16,6 @@ canvas {
   height: 100%;
 }
 
-#fps {
-  position: absolute;
-  color: aliceblue;
-  z-index: 10;
-}
-
 @keyframes show-info {
   0% {
     transform: rotateY(120deg);
@@ -30,61 +25,55 @@ canvas {
   }
 }
 
-.info {
+header {
+  position: absolute;
+  top: 2rem;
+  left: 0;
   transform-origin: 0% 50%;
   transform: rotateY(120deg);
-  position: absolute;
-  font-size: 12px;
+  background: rgba(0, 0, 0, 0.8);
+  font-size: 0.75rem;
   opacity: 0.8;
-  color: #fff;
   width: min(400px, calc(100% / 2));
-  left: 0px;
-  top: 20px;
   animation: show-info 500ms cubic-bezier(0.23, 1, 0.32, 1) 600ms 1 normal forwards;
-  z-index: 5;
+  z-index: 1;
 }
 
-.info img {
+header img {
   max-width: 100%;
 }
 
-.info:hover {
+header:hover {
   box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.05);
   opacity: 1;
 }
 
-.info h3 {
-  line-height: 1;
-  margin: 5px 0;
+header a:hover {
+  opacity: 0.95;
 }
 
-.info a {
+a {
   text-decoration: none;
-  opacity: 0.6;
   color: #fff;
+  opacity: 0.6;
 }
 
-.info a:hover {
-  opacity: 0.99;
-}
-
-.info .about {
-  background: rgba(0, 0, 0, 0.8);
-  padding: 15px 20px;
-}
-
-.info .about h3 {
-  text-transform: uppercase;
-  margin-top: 10px;
-  font-size: 11px;
-}
-
-.info .about a:before {
-  font-size: 14px;
+a:before {
   margin-right: 2px;
+  font-size: 1rem;
   content: "\203A";
 }
 
-.info .about a:after {
-  content: "\00a0\00a0 ";
+a:after {
+  padding-right: 5px;
+}
+
+.about {
+  padding: 1rem;
+}
+
+.links {
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  line-height: 1em;
 }

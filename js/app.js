@@ -12,14 +12,14 @@
 async function main() {
   const canvas = document.querySelector("#glcanvas");
   const gl = canvas.getContext("webgl");
-  const vertexSource = await fetchShader("js/vertex.glsl");
-  const fragmentSource = await fetchShader("js/fragment.glsl");
 
   if (!gl) {
     console.error("Unable to initialize WebGL");
     return;
   }
 
+  const vertexSource = await fetchShader("js/vertex.glsl");
+  const fragmentSource = await fetchShader("js/fragment.glsl");
   const shaderProgram = initShaderProgram(gl, vertexSource, fragmentSource);
 
   const programInfo = {
@@ -28,8 +28,6 @@ async function main() {
       vertexPosition: gl.getAttribLocation(shaderProgram, "a_vertex_pos"),
     },
     uniformLocations: {
-      projectionMatrix: gl.getUniformLocation(shaderProgram, "u_projection_mat"),
-      modelViewMatrix: gl.getUniformLocation(shaderProgram, "u_modelview_mat"),
       resolution: gl.getUniformLocation(shaderProgram, "u_resolution"),
       time: gl.getUniformLocation(shaderProgram, "u_time"),
     },
@@ -69,28 +67,6 @@ function drawScene(gl, programInfo, buffers, time) {
 
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  // Create a perspective matrix, a special matrix that is
-  // used to simulate the distortion of perspective in a camera.
-  const fieldOfView = (45 * Math.PI) / 180;
-  const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
-  const zNear = 0.1;
-  const zFar = 10.0;
-  const projectionMatrix = mat4.create();
-
-  // note: glmatrix.js always has the first argument
-  // as the destination to receive the result.
-  mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
-
-  // Now move the drawing position a bit to where we want to
-  // start drawing the square.
-  const modelViewMatrix = mat4.create();
-
-  mat4.translate(
-    modelViewMatrix, // destination matrix
-    modelViewMatrix, // matrix to translate
-    [0.0, 0.0, -0.2]
-  ); // amount to translate
-
   // Tell WebGL how to pull out the positions from the position
   // buffer into the vertexPosition attribute.
   {
@@ -107,12 +83,9 @@ function drawScene(gl, programInfo, buffers, time) {
 
   gl.useProgram(programInfo.program);
 
-  // Shader uniforms
+  // Uniforms
   gl.uniform1f(programInfo.uniformLocations.time, time * 0.001);
   gl.uniform2f(programInfo.uniformLocations.resolution, gl.canvas.width, gl.canvas.height);
-
-  gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
-  gl.uniformMatrix4fv(programInfo.uniformLocations.modelViewMatrix, false, modelViewMatrix);
 
   {
     const offset = 0;
@@ -173,9 +146,7 @@ function resizeCanvasToDisplaySize(canvas) {
   if (needResize) {
     canvas.width = displayWidth;
     canvas.height = displayHeight;
-    console.log("resizing");
   }
-  return needResize;
 }
 
 main();
