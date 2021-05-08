@@ -59,31 +59,31 @@ vec3 calcNormal(in vec3 p) {
 void main() {
     vec2 uv = gl_FragCoord.xy / u_resolution.xy - vec2(.5);
     vec3 camPos = vec3(.5, .5, 1.);
-    vec3 ray = normalize(vec3(uv, -1.));
+    vec3 rayDir = normalize(vec3(uv, -1.));
 
     // start from camera position
     vec3 rayPos = camPos;
-    float t = 0.;
-    float tMax = 15.;
+    float dist = 0.;
+    float distMax = 15.;
     vec3 currentPos;
 
     for(int i = 0; i < 20; ++i) {
-        currentPos = camPos + t * ray;
+        currentPos = camPos + dist * rayDir;
         float h = sdf(currentPos);
-        if(h < 0.000001 || t > tMax) break;
-        t += h;
+        if(h < 0.000001 || dist > distMax) break;
+        dist += h;
     }
 
     vec3 color = vec3(0.);
 
-    if(t < tMax) {
+    if(dist < distMax) {
         vec3 normal = calcNormal(currentPos);
 
         vec3 material = vec3(.5, .1, .3); 
-        vec3 light = vec3(.5, .5, -2.);
+        vec3 lightPos = vec3(.5, .5, -2.);
         vec3 lightCol = vec3(.6, .4, .5);
 	
-        vec3 lightDir = normalize(light - currentPos);
+        vec3 lightDir = normalize(lightPos - currentPos);
         vec3 diffuse = dot(lightDir, normal) * lightCol * 55.;
 	
         color = diffuse * material;
