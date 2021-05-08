@@ -12,14 +12,14 @@
 async function main() {
   const canvas = document.querySelector("#glcanvas");
   const gl = canvas.getContext("webgl");
-  const vertexSource = await fetchShader("vertex.glsl");
-  const fragmentSource = await fetchShader("fragment.glsl");
 
   if (!gl) {
     console.error("Unable to initialize WebGL");
     return;
   }
 
+  const vertexSource = await fetchShader("vertex.glsl");
+  const fragmentSource = await fetchShader("fragment.glsl");
   const shaderProgram = initShaderProgram(gl, vertexSource, fragmentSource);
 
   const programInfo = {
@@ -42,7 +42,7 @@ async function main() {
     requestAnimationFrame(render);
   }
 
-  requestAnimationFrame(render);
+  render(Date.now());
 }
 
 function initBuffers(gl) {
@@ -69,28 +69,6 @@ function drawScene(gl, programInfo, buffers, time) {
 
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  // Create a perspective matrix, a special matrix that is
-  // used to simulate the distortion of perspective in a camera.
-  const fieldOfView = (45 * Math.PI) / 180; // in radians
-  const aspect = 1.75; //gl.canvas.clientWidth / gl.canvas.clientHeight;
-  const zNear = 0.1;
-  const zFar = 10.0;
-  const projectionMatrix = mat4.create();
-
-  // note: glmatrix.js always has the first argument
-  // as the destination to receive the result.
-  mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
-
-  // Now move the drawing position a bit to where we want to
-  // start drawing the square.
-  const modelViewMatrix = mat4.create();
-
-  mat4.translate(
-    modelViewMatrix, // destination matrix
-    modelViewMatrix, // matrix to translate
-    [0.0, 0.0, -0.2]
-  ); // amount to translate
-
   // Tell WebGL how to pull out the positions from the position
   // buffer into the vertexPosition attribute.
   {
@@ -101,21 +79,15 @@ function drawScene(gl, programInfo, buffers, time) {
     const offset = 0;
     gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
 
-    //const vao = gl.createVertexArray();
-    //gl.bindVertexArray(vao);
-
     gl.vertexAttribPointer(programInfo.attribLocations.vertexPosition, numComponents, type, normalize, stride, offset);
     gl.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
   }
 
   gl.useProgram(programInfo.program);
 
-  // Shader uniforms
+  // Uniforms
   gl.uniform1f(programInfo.uniformLocations.time, time * 0.001);
   gl.uniform2f(programInfo.uniformLocations.resolution, gl.canvas.width, gl.canvas.height);
-
-  gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
-  gl.uniformMatrix4fv(programInfo.uniformLocations.modelViewMatrix, false, modelViewMatrix);
 
   {
     const offset = 0;
@@ -168,8 +140,6 @@ async function fetchShader(shader) {
 }
 
 function resizeCanvasToDisplaySize(canvas) {
-  //const displayWidth  = Math.floor(canvas.clientWidth * .5);
-  //const displayHeight = Math.floor(canvas.clientHeight * .5);
   const displayWidth = canvas.clientWidth;
   const displayHeight = canvas.clientHeight;
 
@@ -179,8 +149,6 @@ function resizeCanvasToDisplaySize(canvas) {
     canvas.width = displayWidth;
     canvas.height = displayHeight;
   }
-
-  return needResize;
 }
 
 main();

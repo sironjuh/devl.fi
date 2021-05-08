@@ -60,36 +60,36 @@ void main() {
     float time = u_time / 4.23;
     vec2 uv = gl_FragCoord.xy / u_resolution.xy - vec2(.5);
     vec3 camPos = vec3(0., 0., 3. + 2. * sin(time));
-    vec3 ray = normalize(vec3(uv, -1.));
+    vec3 rayDir = normalize(vec3(uv, -1.));
 
     // start from camera position
     vec3 rayPos = camPos;
-    float t = 0.;
-    float tMax = 15.;
+    float dist = 0.;
+    float distMax = 15.;
     vec3 currentPos;
 
     // limit to 16 iterations
     for(int i = 0; i < 16; ++i) {
-        currentPos = camPos + t * ray;
+        currentPos = camPos + dist * rayDir;
         float h = sdf(currentPos);
 
-        if(h < 0.0001 || t > tMax) break;
-        t += h;
+        dist += h;
+        if(h < 0.0001 || dist > distMax) break;
     }
 
     vec3 color = vec3(0.);
 
-    if(t < tMax) {
+    if(dist < distMax) {
         vec3 normal = calcNormal(currentPos);
 
-        vec3 mat = vec3(.5, .1, .3); 
-        vec3 light = vec3(.5, .5, -2.);
+        vec3 material = vec3(.5, .1, .3); 
+        vec3 lightPos = vec3(.5, .5, -2.);
         vec3 lightCol = vec3(.6, .4, .5);
 	
-        vec3 lightDir = normalize(light - currentPos);
-        vec3 diff = dot(lightDir, normal) * lightCol * 55.;
+        vec3 lightDir = normalize(lightPos - currentPos);
+        vec3 diffuse = dot(lightDir, normal) * lightCol * 55.;
 	
-        color = diff * mat;
+        color = diffuse * material;
     }
 
     gl_FragColor = vec4(color, 1.);
