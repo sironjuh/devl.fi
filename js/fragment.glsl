@@ -49,26 +49,27 @@ void main() {
     vec2 uv = (gl_FragCoord.xy / u_resolution.xy) - vec2(.5);
     // uv.x *= u_resolution.x / u_resolution.y; // correct aspect ratio
     vec3 camPos = vec3(0., 0., 1.8);
-    vec3 ray = normalize(vec3(uv, -1));
+    vec3 rayDir = normalize(vec3(uv, -1));
 
     // start from camera position
     vec3 rayPos = camPos;
-    float t = 0.;
-    float tMax = 5.;
+    float dist = 0.;
+    float distMax = 5.;
     vec3 currentPos;
 
     // raymarch, limit to 100 iterations
     for(int i = 0; i < 100; ++i) {
-        currentPos = camPos + t * ray;
+        currentPos = camPos + dist * rayDir;
         float h = sdf(currentPos);
-        t += h;
-        if(h < 0.0001 || t > tMax) break;
+        dist += h;
+        if(h < 0.0001 || dist > distMax) break;
     }
 
     // add some gradient on background
     vec3 color = vec3(.5 - length(uv - vec2(0.))); // .00625
-
-    if(t < tMax) {
+    float fresnel;
+    
+    if(dist < distMax) {
         vec3 normal = calcNormal(currentPos);
         color = vec3(normal);
     }

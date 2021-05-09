@@ -71,7 +71,7 @@ void main() {
     // limit to 16 iterations
     for(int i = 0; i < 16; ++i) {
         currentPos = camPos + dist * rayDir;
-        float h = sdf(currentPos);
+        float h = abs(sdf(currentPos));
 
         dist += h;
         if(h < 0.0001 || dist > distMax) break;

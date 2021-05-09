@@ -25,17 +25,14 @@ vec3 rotate(vec3 v, vec3 axis, float angle) {
 }
 
 float displacement(vec3 p) {
-    //float s = sin(u_time) * 1.75;
     return sin(2. * p.x) * sin(2. * p.y) * sin(2. * p.z);
-    //return sin(2. * p.x) * sin(2. * p.y) * sin(s * p.z);
-    //return sin(u_time * p.x) * sin(u_time * p.y) * sin(u_time * p.z);
 }
 
 float sdf(vec3 p) {
     vec3 p1 = rotate(p, vec3(-1.), u_time / 2.);
     float sphere = sdSphere(p1, 0.5);
     float d = displacement(p1);
-    return sphere + d;
+    return mix(sphere, d, .5);
 }
 
 // https://www.iquilezles.org/www/articles/normalsSDF/normalsSDF.htm
@@ -49,35 +46,43 @@ vec3 calcNormal(in vec3 p) {
 
 void main() {
     vec2 uv = gl_FragCoord.xy / u_resolution.xy;
-    vec3 camPos = vec3(0., 0., 1.5);
-    vec3 ray = normalize(vec3((uv - vec2(.5)), -1));
+    vec3 camPos = vec3(0., 0., 2.);
+    vec3 rayDir = normalize(vec3((uv - vec2(.5)), -1));
 
     // start from camera position
     vec3 rayPos = camPos;
-    float t = 0.;
-    float tMax = 3.;
+    float dist = 0.;
+    float distMax = 15.;
     vec3 currentPos;
+    float p;
+    
+    // raymarch, limit to 128 iterations
+    for(float i = 0.; i < 128.; ++i) {
+        currentPos = camPos + dist * rayDir;
+        float h = abs(sdf(currentPos));
 
-    // limit to 256 iterations
-    for(int i = 0; i < 128; ++i) {
-        currentPos = camPos + t * ray;
-        float h = sdf(currentPos);
-
-        //float acc = 0.05 * (sin(u_time / 2.) + 1.0);
-
-        if(h < 0.001 || t > tMax) break; // decent static 0.001
-        t += h;
+        dist += h;
+        p = i;
+        if(h < 0.004 || dist > distMax) break;
     }
 
     vec3 color = vec3(.0625);
+    float fresnel;
 
-    if(t < tMax) {
+    if(dist < distMax) {
         vec3 normal = calcNormal(currentPos);
-        color = vec3(normal);
+        //color = vec3(normal);
 
-        // directional light
-        //float diff = dot(vec3(1.), normal);
-        //color = vec3(diff);
+        float diffuse = dot(vec3(1.), normal);
+
+        fresnel = pow(1. + dot(normal, rayDir), 3.);
+        color = vec3(fresnel);
+
+        color = vec3(diffuse) * 2. * fresnel;
+        color *= vec3(.2, .5, .8);
+    }
+    if(distMax < dist) {
+        color = 1. - vec3(1. - ((2. * p) / 256.));
     }
 
     gl_FragColor = vec4(color, 1.);

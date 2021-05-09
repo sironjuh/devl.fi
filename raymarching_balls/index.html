@@ -2,18 +2,40 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>lights</title>
+
+    <meta name="og:title" content="Raymarching balls" />
+    <meta name="og:description" content="Fresnel, glow, inside volume" />
+    <meta name="og:image" content="https://www.devl.fi/raspberry-liquorice/preview.jpg" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:domain" content="devl.fi" />
+    <meta name="twitter:title" content="Raymarching balls" />
+    <meta name="twitter:description" content="Fresnel, glow, inside volume" />
+    <meta name="twitter:image" content="https://www.devl.fi/raymarching_balls/preview.jpg" />
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap" rel="stylesheet" />
+
+    <title>Raymarching balls - Juha-Matti Sironen</title>
     <link rel="stylesheet" href="./base.css" type="text/css" />
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"
-      integrity="sha512-zhHQR0/H5SEBL3Wn6yYSaTTZej12z0hVZKOv3TwCUXT1z5qeqGcXJLLrbERYRScEDDpYIJhPC1fk31gqR783iQ=="
-      crossorigin="anonymous"
-      defer
-    ></script>
     <script src="app.js" defer></script>
   </head>
 
   <body>
+    <header>
+      <h2>Raymarching balls</h2>
+    </header>
     <canvas id="glcanvas"></canvas>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-128653906-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "UA-128653906-1");
+    </script>
   </body>
 </html>
