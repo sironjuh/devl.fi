@@ -46,31 +46,29 @@ vec3 calcNormal(in vec3 p) {
 }
 
 void main() {
-    vec2 uv = (gl_FragCoord.xy / u_resolution.xy) - vec2(.5);
-    // uv.x *= u_resolution.x / u_resolution.y; // correct aspect ratio
-    vec3 camPos = vec3(0., 0., 1.8);
-    vec3 rayDir = normalize(vec3(uv, -1));
+    vec2 uv = (2. * gl_FragCoord.xy - u_resolution.xy) / u_resolution.y;
+    vec2 stretched_uv = (gl_FragCoord.xy / u_resolution.xy) - vec2(.5);
+    vec3 camPos = vec3(0., 0., 2);
+    vec3 rayDir = normalize(vec3(uv, -2));
 
-    // start from camera position
-    vec3 rayPos = camPos;
     float dist = 0.;
-    float distMax = 5.;
+    float distMax = 4.;
     vec3 currentPos;
-
+    
     // raymarch, limit to 100 iterations
     for(int i = 0; i < 100; ++i) {
         currentPos = camPos + dist * rayDir;
-        float h = sdf(currentPos);
+        float h = sdf(currentPos); //abs to peek inside
         dist += h;
-        if(h < 0.0001 || dist > distMax) break;
+        if(h < 0.004 || dist > distMax) break;
     }
 
-    // add some gradient on background
-    vec3 color = vec3(.5 - length(uv - vec2(0.))); // .00625
-    float fresnel;
+    // add some gradient on background (solid value in css .00625)
+    vec3 color = vec3(.5 - length(stretched_uv - vec2(0.)));
     
     if(dist < distMax) {
         vec3 normal = calcNormal(currentPos);
+        //float diffuse = dot(normalize(vec3(3.)), normal);
         color = vec3(normal);
     }
 

@@ -40,7 +40,7 @@ async function main() {
     requestAnimationFrame(render);
   }
 
-  render(Date.now());
+  requestAnimationFrame(render);
 }
 
 function initBuffers(gl) {
