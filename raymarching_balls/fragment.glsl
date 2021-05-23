@@ -29,7 +29,7 @@ float displacement(vec3 p) {
 }
 
 float sdf(vec3 p) {
-    vec3 p1 = rotate(p, vec3(-1.), u_time / 2.);
+    vec3 p1 = rotate(p, vec3(sin(u_time), cos(u_time), 1.), u_time / 2.);
     float sphere = sdSphere(p1, 0.5);
     float d = displacement(p1);
     return mix(sphere, d, .5);
@@ -45,21 +45,19 @@ vec3 calcNormal(in vec3 p) {
 }
 
 void main() {
-    vec2 uv = gl_FragCoord.xy / u_resolution.xy;
-    vec3 camPos = vec3(0., 0., 2.);
-    vec3 rayDir = normalize(vec3((uv - vec2(.5)), -1));
+    vec2 uv = (2. * gl_FragCoord.xy - u_resolution.xy) / u_resolution.y;
+    vec3 camPos = vec3(0., 0., 2);
+    vec3 rayDir = normalize(vec3(uv, -1.8));
 
-    // start from camera position
-    vec3 rayPos = camPos;
     float dist = 0.;
-    float distMax = 15.;
+    float distMax = 4.;
     vec3 currentPos;
     float p;
     
     // raymarch, limit to 128 iterations
     for(float i = 0.; i < 128.; ++i) {
         currentPos = camPos + dist * rayDir;
-        float h = abs(sdf(currentPos));
+        float h = sdf(currentPos); //abs to peek inside
 
         dist += h;
         p = i;
@@ -71,18 +69,14 @@ void main() {
 
     if(dist < distMax) {
         vec3 normal = calcNormal(currentPos);
-        //color = vec3(normal);
-
         float diffuse = dot(vec3(1.), normal);
+        color = vec3(diffuse);
+        color *= vec3(.2, .5, .8);
 
         fresnel = pow(1. + dot(normal, rayDir), 3.);
-        color = vec3(fresnel);
-
-        color = vec3(diffuse) * 2. * fresnel;
-        color *= vec3(.2, .5, .8);
-    }
-    if(distMax < dist) {
-        color = 1. - vec3(1. - ((2. * p) / 256.));
+        color *= fresnel * 2.;
+    } else {
+        color = 1. - vec3(1. - ((3. * p) / 256.));
     }
 
     gl_FragColor = vec4(color, 1.);

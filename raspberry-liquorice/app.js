@@ -97,10 +97,39 @@ async function main() {
 
   const buffers = initBuffers(gl);
 
+  const fps = {
+    sampleSize: 300,
+    samples: [],
+    initTick: performance.now(),
+    currentTick: 0,
+    eventSent: false,
+
+    tick: function () {
+      this.currentTick = performance.now();
+      if (this.samples.length < this.sampleSize) {
+        this.samples.push(this.currentTick - this.initTick);
+        this.initTick = this.currentTick;
+      }
+      if (this.samples.length === this.sampleSize) {
+        const sum = this.samples.reduce((a, b) => a + b, 0);
+        const fps = 1000 / (sum / this.sampleSize);
+        console.log({renderer: renderer, fps: fps });
+        this.samples = [];
+        
+        if (gtag !== undefined  && !this.eventSent) {
+          gtag("event", "gpu", { event_label: renderer, value: fps });
+          this.eventSent = true;
+        }
+      }
+    },
+  };
+
   function render(now) {
+    fps.tick();
     drawScene(gl, programInfo, buffers, now);
     requestAnimationFrame(render);
   }
+
   render(Date.now());
 }
 
