@@ -2,18 +2,42 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>lights</title>
+
+    <meta name="og:title" content="Lights" />
+    <meta name="og:description" content="Look into shaders" />
+    <meta name="og:image" content="https://www.devl.fi/lights/preview.jpg" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:domain" content="devl.fi" />
+    <meta name="twitter:title" content="Lights" />
+    <meta name="twitter:description" content="Look into shaders" />
+    <meta name="twitter:image" content="https://www.devl.fi/mandelbulb-part2/preview.jpg" />
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap" rel="stylesheet" />
+
+    <title>Lights | Juha-Matti Sironen</title>
     <link rel="stylesheet" href="./base.css" type="text/css" />
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"
-      integrity="sha512-zhHQR0/H5SEBL3Wn6yYSaTTZej12z0hVZKOv3TwCUXT1z5qeqGcXJLLrbERYRScEDDpYIJhPC1fk31gqR783iQ=="
-      crossorigin="anonymous"
-      defer
-    ></script>
     <script src="lights.js" defer></script>
   </head>
 
   <body>
+    <header>
+      <h2>Lights</h2>
+    </header>
     <canvas id="glcanvas"></canvas>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-128653906-1"></script>
+    <script>
+      if(window.location.host === "www.devl.fi") {
+        window.dataLayer = window.dataLayer || [];
+        function gtag() {
+          dataLayer.push(arguments);
+        }
+        gtag("js", new Date());
+        gtag("config", "UA-128653906-1");
+      }
+    </script>
   </body>
 </html>
