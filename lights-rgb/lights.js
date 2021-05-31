@@ -29,22 +29,27 @@ function main() {
     uniform vec2 u_resolution;
     uniform float u_time;
 
-    float time = u_time * .25;
+    float time = u_time * .2;
 
     void main() {
       vec2 uv = gl_FragCoord.xy / u_resolution.xy;
-      float result = 0.0;
+      float result[9];
 
-      for(float i = 0.; i < 6.; i++) {
+      for(int i = 0; i < 9; i++) {
+        float i_time = float(i);
+        i_time++;
         vec2 pos;
 
-        pos.x = .5 + sin(time + time * i) * .5;
-        pos.y = .5 + cos(time + time * i) * .5;
+        pos.x = .5 + sin(i_time) * sin((time + i_time) * i_time) * .5;
+        pos.y = .5 + sin(i_time) * cos((time + i_time) * i_time) * .5;
         
-        result += (1. - pow(length(pos - uv), .25));
+        result[i] = 1. - pow(length(pos - uv), .4);
       }
       
-      gl_FragColor = vec4(result);
+      gl_FragColor = vec4(result[0] + result[5] + result[7],
+                          result[1] + result[3] + result[8],
+                          result[2] + result[4] + result[6],
+                          1);
     }
   `;
 
