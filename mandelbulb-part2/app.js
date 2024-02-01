@@ -45,7 +45,6 @@ async function main() {
     samples: [],
     initTick: performance.now(),
     currentTick: 0,
-    eventSent: false,
 
     tick: function () {
       this.currentTick = performance.now();
@@ -58,11 +57,6 @@ async function main() {
         const fps = 1000 / (sum / this.sampleSize);
         console.log({renderer: renderer, fps: fps });
         this.samples = [];
-        
-        if (gtag !== undefined  && !this.eventSent) {
-          gtag("event", "gpu", { event_label: renderer, value: fps });
-          this.eventSent = true;
-        }
       }
     },
   };

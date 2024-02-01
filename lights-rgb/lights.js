@@ -29,11 +29,11 @@ function main() {
     uniform vec2 u_resolution;
     uniform float u_time;
 
-    float time = u_time * .2;
-
     void main() {
       vec2 uv = gl_FragCoord.xy / u_resolution.xy;
+
       float result[9];
+      float time = u_time * .2;
 
       for(int i = 0; i < 9; i++) {
         float i_time = float(i);
@@ -73,7 +73,6 @@ function main() {
     samples: [],
     initTick: performance.now(),
     currentTick: 0,
-    eventSent: false,
 
     tick: function () {
       this.currentTick = performance.now();
@@ -86,11 +85,6 @@ function main() {
         const fps = 1000 / (sum / this.sampleSize);
         console.log({renderer: renderer, fps: fps });
         this.samples = [];
-        
-        if (gtag !== undefined  && !this.eventSent) {
-          gtag("event", "gpu", { event_label: renderer, value: fps });
-          this.eventSent = true;
-        }
       }
     },
   };
