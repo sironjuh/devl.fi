@@ -31,12 +31,23 @@ header {
   left: 0;
   transform-origin: 0% 50%;
   transform: rotateY(120deg);
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(16px);
   font-size: 0.75rem;
   opacity: 0.8;
   width: min(400px, calc(100% / 2));
   animation: show-info 500ms cubic-bezier(0.23, 1, 0.32, 1) 600ms 1 normal forwards;
   z-index: 1;
+}
+
+
+.backdrop {
+  position: absolute;
+
+  border-radius: 4px;
+  
+  pointer-events: none;
+
 }
 
 header img {

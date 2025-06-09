@@ -18,8 +18,8 @@ async function main() {
     return;
   }
 
-  const vertexSource = await fetchShader("js/vertex.glsl");
-  const fragmentSource = await fetchShader("js/fragment.glsl");
+  const vertexSource = await fetchShader("/js/shader.vert");
+  const fragmentSource = await fetchShader("/js/shader.frag");
 
   const debugInfo = gl.getExtension("WEBGL_debug_renderer_info");
   const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
@@ -44,7 +44,6 @@ async function main() {
     samples: [],
     initTick: performance.now(),
     currentTick: 0,
-    eventSent: false,
 
     tick: function () {
       this.currentTick = performance.now();
@@ -57,11 +56,6 @@ async function main() {
         const fps = 1000 / (sum / this.sampleSize);
         console.log({renderer: renderer, fps: fps });
         this.samples = [];
-        
-        if (gtag !== undefined  && !this.eventSent) {
-          gtag("event", "gpu", { event_label: renderer, value: fps });
-          this.eventSent = true;
-        }
       }
     },
   };
